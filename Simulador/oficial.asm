@@ -1,4 +1,3 @@
-
 .data
 objeto_valores: .word 50, 20, 30, 10  # Define valores de ejemplo para objetos
 concurso: .word 0
@@ -372,8 +371,8 @@ _check_gold:
     _finish_check:
 
     lw a0, 4(sp)
-	lw a1, 8(sp)
-	lw ra, 0(sp)
+    lw a1, 8(sp)
+    lw ra, 0(sp)
     addi sp, sp, 12           # Liberar espacio en el stack
     jalr zero, 0(ra)         # Retornar
 
@@ -426,17 +425,17 @@ _check_status:
     addi a0, a1, 0              # Cambiar al segundo Pokémon
     jal ra, _check_individual_status
 
-    lw a1, 8(sp)             # Restaurar ra
-    lw a0, 4(sp)             # Restaurar ra
-    lw ra, 0(sp)             # Restaurar ra
+    lw a1, 8(sp)              # Restaurar a1
+    lw a0, 4(sp)              # Restaurar a0
+    lw ra, 0(sp)              # Restaurar ra
     addi sp, sp, 12           # Liberar espacio en el stack
-    jalr zero, 0(ra)         # Retornar
+    jalr zero, 0(ra)          # Retornar
 
 _check_individual_status:
-    lw t0, 12(a0)            # Cargar estado del Pokémon
-    addi t3, zero, 30                # Probabilidad de curar
+    lw t0, 12(a0)             # Cargar estado del Pokémon
+    addi t3, zero, 30         # Probabilidad de curar
     bnez t0, _handle_status   # Si el estado es diferente de saludable
-    jalr zero, 0(ra)         # Retornar si está saludable
+    jalr zero, 0(ra)          # Retornar si está saludable
 
 _handle_status:
     # Imprimir mensaje de manejo del estado
@@ -444,25 +443,25 @@ _handle_status:
     jal ra, _print_string
 
     # Revisar probabilidad de curar
-    jal ra, _rand_number     # Obtener número aleatorio
+    jal ra, _rand_number      # Obtener número aleatorio
     blt a0, t3, _set_healthy
-    jalr zero, 0(ra)         # Retornar
+    jalr zero, 0(ra)          # Retornar
 
 _set_healthy:
     # Imprimir mensaje de cambio a saludable
     la a0, set_healthy_text
     jal ra, _print_string
 
-    sw zero, 12(a0)          # Cambiar estado a saludable
-    jalr zero, 0(ra)         # Retornar
+    sw zero, 12(a0)           # Cambiar estado a saludable
+    jalr zero, 0(ra)          # Retornar
 
 
 # Subrutina presentation: Computar los puntos de belleza y las estrellas de plata
 presentation:    # a0: dirección del pokemon atacante, a1: dirección del pokemon defensor
-    addi sp, sp, -8           # Reserva espacio en el stack
+    addi sp, sp, -8           # Reservar espacio en el stack
     sw ra, 0(sp)              # Respaldar ra
     sw s0, 4(sp)              # Respaldar s0
-    add s0, zero, a0          # Copia la dirección del atacante en s0
+    add s0, zero, a0          # Copiar la dirección del atacante en s0
 
     # Obtener objeto del atacante y contrincante
     lw t0, 40(s0)             # Objeto del atacante
@@ -470,16 +469,16 @@ presentation:    # a0: dirección del pokemon atacante, a1: dirección del pokem
 
     # Calcular puntos de belleza del atacante
     la t2, objeto_valores
-    slli t0, t0, 2            # Multiplica por 4 (desplazamiento)
-    add t2, t2, t0            # Apunta al valor de ataque correspondiente en objeto_valores
+    slli t0, t0, 2            # Multiplicar por 4 (desplazamiento)
+    add t2, t2, t0            # Apuntar al valor de ataque correspondiente en objeto_valores
     lw t3, 0(t2)              # t3 obtiene el offset del atributo a cargar
-    lw t4, 0(s0)              # Carga el valor real del atributo (Ataque, Defensa, etc.)
-    add t5, t4, zero          # Almacena puntos de belleza en t5
+    lw t4, 0(s0)              # Cargar el valor real del atributo (Ataque, Defensa, etc.)
+    add t5, t4, zero          # Almacenar puntos de belleza en t5
 
     # Calcular puntos de belleza del defensor
     la t2, objeto_valores
-    slli t1, t1, 2            # Multiplica por 4 (desplazamiento)
-    add t2, t2, t1            # Apunta al valor de defensa correspondiente en objeto_valores
+    slli t1, t1, 2            # Multiplicar por 4 (desplazamiento)
+    add t2, t2, t1            # Apuntar al valor de defensa correspondiente en objeto_valores
     lw t3, 0(t2)
     lw t4, 0(a1)
     add t6, t4, zero          # Puntos de belleza del defensor en t6
@@ -490,176 +489,177 @@ presentation:    # a0: dirección del pokemon atacante, a1: dirección del pokem
     # Implementar las condiciones de comparación y calcular ponderador
 
     # Calcular y actualizar estrellas plateadas
-    sub t2, t5, t6            # Resta puntos de belleza
+    sub t2, t5, t6            # Restar puntos de belleza
     add t2, t2, t3            # Sumar ponderador (asumiendo que t3 es el ponderador calculado)
     # Asegurar que estrellas plateadas no sean negativas
 
     lw ra, 0(sp)              # Restaurar ra
     lw s0, 4(sp)              # Restaurar s0
     addi sp, sp, 8            # Liberar espacio en el stack
+    jalr zero, 0(ra)          # Retornar
+
+
+# Subrutina presentation_turn: Maneja la presentación por turnos de los Pokémon
+presentation_turn:
+    addi sp, sp, -20          # Reservar espacio en el stack
+    sw ra, 0(sp)              # Respaldar ra
+    sw s0, 4(sp)              # Respaldar s0
+    sw s1, 8(sp)              # Respaldar s1
+    sw s2, 12(sp)             # Respaldar s2
+    sw s3, 16(sp)             # Respaldar s3
+
+    add s0, a0, zero          # s0 = dirección del primer Pokémon
+    add s1, a1, zero          # s1 = dirección del segundo Pokémon
+
+    # Calcular velocidades efectivas
+    jal ra, _calculate_effective_speed
+    add s2, a0, zero          # s2 = velocidad efectiva del primer Pokémon
+    add a0, s1, zero
+    jal ra, _calculate_effective_speed
+    add s3, a0, zero          # s3 = velocidad efectiva del segundo Pokémon
+
+    # Comparar velocidades y decidir orden
+    blt s2, s3, _second_first
+    blt s3, s2, _first_first
+    # En caso de empate, comparar IDs
+    lw t0, 0(s0)
+    lw t1, 0(s1)
+    blt t0, t1, _second_first
+
+_first_first:
+    add a0, s0, zero
+    add a1, s1, zero
+    jal ra, presentation
+    add a0, s1, zero
+    add a1, s0, zero
+    jal ra, presentation
+    beq zero, zero, _end_presentation_turn
+
+_second_first:
+    add a0, s1, zero
+    add a1, s0, zero
+    jal ra, presentation
+    add a0, s0, zero
+    add a1, s1, zero
+    jal ra, presentation
+
+_end_presentation_turn:
+    lw ra, 0(sp)              # Restaurar ra
+    lw s0, 4(sp)              # Restaurar s0
+    lw s1, 8(sp)              # Restaurar s1
+    lw s2, 12(sp)             # Restaurar s2
+    lw s3, 16(sp)             # Restaurar s3
+    addi sp, sp, 20           # Liberar espacio en el stack
+    jalr zero, 0(ra)          # Retornar
+
+# Subrutina auxiliar para calcular la velocidad efectiva
+_calculate_effective_speed:
+    lw t0, 36(a0)             # Cargar velocidad base
+    lw t1, 12(a0)             # Cargar estado
+    addi t2, zero, 2
+    bne t1, t2, _return_speed # Si no está paralizado, retornar velocidad base
+    # Si está paralizado, dividir velocidad por 4
+    srli t0, t0, 2            # Dividir por 4 (shift right logical immediate)
+_return_speed:
+    add a0, t0, zero          # Retornar velocidad efectiva en a0
     jalr zero, 0(ra)
 
+# Subrutina judge: Jueza premia o castiga a los Pokémon
+judge:
+    addi sp, sp, -16          # Reservar espacio en el stack
+    sw ra, 0(sp)              # Respaldar ra
+    sw s0, 4(sp)              # Respaldar s0
+    sw s1, 8(sp)              # Respaldar s1
+    sw s2, 12(sp)             # Respaldar s2
 
-    # Subrutina presentation_turn: Maneja la presentación por turnos de los Pokémon
-    presentation_turn:
-        addi sp, sp, -20          # Reservar espacio en el stack
-        sw ra, 0(sp)              # Respaldar ra
-        sw s0, 4(sp)              # Respaldar s0
-        sw s1, 8(sp)              # Respaldar s1
-        sw s2, 12(sp)             # Respaldar s2
-        sw s3, 16(sp)             # Respaldar s3
+    add s0, a0, zero          # s0 = dirección del primer Pokémon
+    add s1, a1, zero          # s1 = dirección del segundo Pokémon
 
-        add s0, a0, zero          # s0 = dirección del primer Pokémon
-        add s1, a1, zero          # s1 = dirección del segundo Pokémon
+    # Calcular total de listones
+    lw t0, 8(s0)              # Listones del primer Pokémon
+    lw t1, 8(s1)              # Listones del segundo Pokémon
+    add s2, t0, t1            # s2 = total de listones
 
-        # Calcular velocidades efectivas
-        jal ra, _calculate_effective_speed
-        add s2, a0, zero          # s2 = velocidad efectiva del primer Pokémon
-        add a0, s1, zero
-        jal ra, _calculate_effective_speed
-        add s3, a0, zero          # s3 = velocidad efectiva del segundo Pokémon
+    # Decidir acción basada en total de listones
+    beq s2, zero, _give_silver_stars
+    addi t2, zero, 3
+    ble s2, t2, _poison_pokemon
+    addi t2, zero, 7
+    ble s2, t2, _burn_pokemon
+    beq zero, zero, _paralyze_pokemon
 
-        # Comparar velocidades y decidir orden
-        blt s2, s3, _second_first
-        blt s3, s2, _first_first
-        # En caso de empate, comparar IDs
-        lw t0, 0(s0)
-        lw t1, 0(s1)
-        blt t0, t1, _second_first
+_give_silver_stars:
+    lw t0, 48(s0)             # Estrellas plateadas del primer Pokémon
+    lw t1, 48(s1)             # Estrellas plateadas del segundo Pokémon
+    blt t0, t1, _give_stars_to_first
+    blt t1, t0, _give_stars_to_second
+    # En caso de empate, comparar IDs
+    lw t0, 0(s0)
+    lw t1, 0(s1)
+    bgt t0, t1, _give_stars_to_second
+    beq zero, zero, _give_stars_to_first
 
-    _first_first:
-        add a0, s0, zero
-        add a1, s1, zero
-        jal ra, presentation
-        add a0, s1, zero
-        add a1, s0, zero
-        jal ra, presentation
-        beq zero, zero, _end_presentation_turn
+_give_stars_to_first:
+    lw t0, 48(s0)
+    addi t0, t0, 5
+    sw t0, 48(s0)
+    beq zero, zero, _end_judge
 
-    _second_first:
-        add a0, s1, zero
-        add a1, s0, zero
-        jal ra, presentation
-        add a0, s0, zero
-        add a1, s1, zero
-        jal ra, presentation
+_give_stars_to_second:
+    lw t0, 48(s1)
+    addi t0, t0, 5
+    sw t0, 48(s1)
+    beq zero, zero, _end_judge
 
-    _end_presentation_turn:
-        lw ra, 0(sp)              # Restaurar ra
-        lw s0, 4(sp)              # Restaurar s0
-        lw s1, 8(sp)              # Restaurar s1
-        lw s2, 12(sp)             # Restaurar s2
-        lw s3, 16(sp)             # Restaurar s3
-        addi sp, sp, 20           # Liberar espacio en el stack
-        jalr zero, 0(ra)          # Retornar
+_poison_pokemon:
+    jal ra, _get_pokemon_with_more_ribbons
+    addi t1, zero, 1          # Estado: Envenenado
+    beq zero, zero, _apply_status
 
-    # Subrutina auxiliar para calcular la velocidad efectiva
-    _calculate_effective_speed:
-        lw t0, 36(a0)             # Cargar velocidad base
-        lw t1, 12(a0)             # Cargar estado
-        addi t2, zero, 2
-        bne t1, t2, _return_speed # Si no está paralizado, retornar velocidad base
-        # Si está paralizado, dividir velocidad por 4
-        srli t0, t0, 2            # Dividir por 4 (shift right logical immediate)
-    _return_speed:
-        add a0, t0, zero          # Retornar velocidad efectiva en a0
-        jalr zero, 0(ra)
+_burn_pokemon:
+    jal ra, _get_pokemon_with_more_ribbons
+    addi t1, zero, 3          # Estado: Quemado
+    beq zero, zero, _apply_status
 
-    # Subrutina judge: Jueza premia o castiga a los Pokémon
-    judge:
-        addi sp, sp, -16          # Reservar espacio en el stack
-        sw ra, 0(sp)              # Respaldar ra
-        sw s0, 4(sp)              # Respaldar s0
-        sw s1, 8(sp)              # Respaldar s1
-        sw s2, 12(sp)             # Respaldar s2
+_paralyze_pokemon:
+    jal ra, _get_pokemon_with_more_ribbons
+    addi t1, zero, 2          # Estado: Paralizado
 
-        add s0, a0, zero          # s0 = dirección del primer Pokémon
-        add s1, a1, zero          # s1 = dirección del segundo Pokémon
+_apply_status:
+    lw t2, 12(a0)             # Cargar estado actual
+    blt t2, t1, _update_status
+    beq zero, zero, _end_judge
 
-        # Calcular total de listones
-        lw t0, 8(s0)              # Listones del primer Pokémon
-        lw t1, 8(s1)              # Listones del segundo Pokémon
-        add s2, t0, t1            # s2 = total de listones
+_update_status:
+    sw t1, 12(a0)             # Actualizar estado
 
-        # Decidir acción basada en total de listones
-        beq s2, zero, _give_silver_stars
-        addi t2, zero, 3
-        ble s2, t2, _poison_pokemon
-        addi t2, zero, 7
-        ble s2, t2, _burn_pokemon
-        beq zero, zero, _paralyze_pokemon
+_end_judge:
+    lw ra, 0(sp)              # Restaurar ra
+    lw s0, 4(sp)              # Restaurar s0
+    lw s1, 8(sp)              # Restaurar s1
+    lw s2, 12(sp)             # Restaurar s2
+    addi sp, sp, 16           # Liberar espacio en el stack
+    jalr zero, 0(ra)          # Retornar
 
-    _give_silver_stars:
-        lw t0, 48(s0)             # Estrellas plateadas del primer Pokémon
-        lw t1, 48(s1)             # Estrellas plateadas del segundo Pokémon
-        blt t0, t1, _give_stars_to_first
-        blt t1, t0, _give_stars_to_second
-        # En caso de empate, comparar IDs
-        lw t0, 0(s0)
-        lw t1, 0(s1)
-        bgt t0, t1, _give_stars_to_second
-        beq zero, zero, _give_stars_to_first
+# Subrutina auxiliar para obtener el Pokémon con más listones
+_get_pokemon_with_more_ribbons:
+    lw t0, 8(s0)              # Listones del primer Pokémon
+    lw t1, 8(s1)              # Listones del segundo Pokémon
+    blt t0, t1, _second_has_more
+    blt t1, t0, _first_has_more
+    # En caso de empate, comparar IDs
+    lw t0, 0(s0)
+    lw t1, 0(s1)
+    blt t0, t1, _second_has_more
 
-    _give_stars_to_first:
-        lw t0, 48(s0)
-        addi t0, t0, 5
-        sw t0, 48(s0)
-        beq zero, zero, _end_judge
+_first_has_more:
+    add a0, s0, zero
+    jalr zero, 0(ra)
 
-    _give_stars_to_second:
-        lw t0, 48(s1)
-        addi t0, t0, 5
-        sw t0, 48(s1)
-        beq zero, zero, _end_judge
+_second_has_more:
+    add a0, s1, zero
+    jalr zero, 0(ra)
 
-    _poison_pokemon:
-        jal ra, _get_pokemon_with_more_ribbons
-        addi t1, zero, 1          # Estado: Envenenado
-        beq zero, zero, _apply_status
-
-    _burn_pokemon:
-        jal ra, _get_pokemon_with_more_ribbons
-        addi t1, zero, 3          # Estado: Quemado
-        beq zero, zero, _apply_status
-
-    _paralyze_pokemon:
-        jal ra, _get_pokemon_with_more_ribbons
-        addi t1, zero, 2          # Estado: Paralizado
-
-    _apply_status:
-        lw t2, 12(a0)             # Cargar estado actual
-        blt t2, t1, _update_status
-        beq zero, zero, _end_judge
-
-    _update_status:
-        sw t1, 12(a0)             # Actualizar estado
-
-    _end_judge:
-        lw ra, 0(sp)              # Restaurar ra
-        lw s0, 4(sp)              # Restaurar s0
-        lw s1, 8(sp)              # Restaurar s1
-        lw s2, 12(sp)             # Restaurar s2
-        addi sp, sp, 16           # Liberar espacio en el stack
-        jalr zero, 0(ra)          # Retornar
-
-    # Subrutina auxiliar para obtener el Pokémon con más listones
-    _get_pokemon_with_more_ribbons:
-        lw t0, 8(s0)              # Listones del primer Pokémon
-        lw t1, 8(s1)              # Listones del segundo Pokémon
-        blt t0, t1, _second_has_more
-        blt t1, t0, _first_has_more
-        # En caso de empate, comparar IDs
-        lw t0, 0(s0)
-        lw t1, 0(s1)
-        blt t0, t1, _second_has_more
-
-    _first_has_more:
-        add a0, s0, zero
-        jalr zero, 0(ra)
-
-    _second_has_more:
-        add a0, s1, zero
-        jalr zero, 0(ra)
 _start:
     # Concurso Bulbasaur vs Charmander
     la a0, bulbasaur
@@ -686,10 +686,9 @@ _start:
     addi a7, zero, 10
     ecall
 
-
-    #####################################################
-    ## Concurso Bulbasaur vs Charmander
-    #####################################################
+#####################################################
+## Concurso Bulbasaur vs Charmander
+#####################################################
 
     la a0, bulbasaur
     la a1, charmander
@@ -707,5 +706,5 @@ _start:
     jal ra, _print_pokemon
     addi a7, zero, 10
     ecall
-   
+
 _end:
